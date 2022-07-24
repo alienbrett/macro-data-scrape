@@ -1,4 +1,6 @@
-# Scrape macro data quickly and easily in python
+# Scrape macro data
+Scrape macro data quickly and easily in python, asynchronously!
+
 These tools are meant to provide users with programatic access to financial data sources. I put the effort in to scrape these so that you don't have to.
 
 Currently only CME SOFR futures are supported, but its pretty easy to add other CME sources. If you find the product code and the landing page, you can build a class in like 2 lines that scrapes a different futures product from the site.
