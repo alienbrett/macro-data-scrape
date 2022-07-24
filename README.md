@@ -3,7 +3,11 @@ Scrape macro data quickly and easily in python, asynchronously!
 
 These tools are meant to provide users with programatic access to financial data sources. I put the effort in to scrape these so that you don't have to.
 
-Currently only CME SOFR futures are supported, but its pretty easy to add other CME sources. If you find the product code and the landing page, you can build a class in like 2 lines that scrapes a different futures product from the site.
+## Supports
+* SOFR historical rates, from NYC Fed site
+* CME 1M and 3M SOFR futures quotes
+
+Its pretty easy to add other CME sources if you need. If you find the product code and the landing page, you can build a class in like 2 lines that scrapes a different futures product from the site.
 
 ## Notice
 * These endpoints may change, which could render these utils broken until fixed
@@ -26,5 +30,17 @@ print(sofr_1m_req.data_df.head())
 sofr_3m_req = CME3MSOFRFutureScrapeRequest()
 asyncio.run(sofr_3m_req.load(verbose=True))
 print(sofr_3m_req.data_df.head())
+
+```
+
+
+## Loading sofr historical data
+```python3
+import asyncio
+from fed_sofr_history import FedSOFRHistoryRequest
+
+sofr_hist_req = FedSOFRHistoryRequest(limit=10)
+asyncio.run(sofr_hist_req.load())
+print(sofr_hist_req.data_df.head())
 
 ```
