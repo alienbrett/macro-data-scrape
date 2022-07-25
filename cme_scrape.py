@@ -64,7 +64,7 @@ class CMEFutureScrapeRequest:
 
 @dataclasses.dataclass
 class CME3MSOFRFutureScrapeRequest(CMEFutureScrapeRequest):
-    page_url    : str = 'https://www.cmegroup.com/markets/interest-rates/stirs/one-month-sofr.quotes.html'
+    page_url    : str = 'https://www.cmegroup.com/markets/interest-rates/stirs/three-month-sofr.quotes.html'
     product_id  : int = 8462
 
 
