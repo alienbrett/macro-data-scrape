@@ -16,7 +16,7 @@ class FedSOFRHistoryRequest:
         Data can be viewed online at https://www.newyorkfed.org/markets/reference-rates/sofr
         '''
 
-        if self.data_df is not None:
+        if self.data_df is None:
             url = 'https://markets.newyorkfed.org/read'
             params = {
                 'productCode': '50',
