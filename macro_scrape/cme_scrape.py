@@ -1,9 +1,16 @@
-import asyncio
+# import asyncio
 import httpx
+import datetime
+import numpy as np
 import pandas as pd
 import dataclasses
 import typing
 import math
+import time
+import calendar
+
+
+cal = calendar.Calendar(firstweekday=calendar.SUNDAY)
 
 
 user_agent = "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Mobile Safari/537.36"
@@ -15,6 +22,9 @@ headers = {
     'Accept-Language': 'en-US;q=0.9',
     'Upgrade-Insecure-Requests': '1',
 }
+
+
+
 
 @dataclasses.dataclass
 class CMEFutureScrapeRequest:
@@ -72,3 +82,48 @@ class CME3MSOFRFutureScrapeRequest(CMEFutureScrapeRequest):
 class CME1MSOFRFutureScrapeRequest(CMEFutureScrapeRequest):
     page_url    : str = 'https://www.cmegroup.com/markets/interest-rates/stirs/one-month-sofr.quotes.html'
     product_id  : int = 8463
+
+
+
+
+def expand_col(df, col):
+    return df.drop(columns=[col]).merge(df[col].apply(pd.Series), left_index=True, right_index=True)
+
+def kth_weekday_of_month(year, month, k, weekday_num):
+    '''
+    print(kth_weekday_of_month(2022,4, 2, calendar.FRIDAY))
+    '''
+    monthcal = cal.monthdatescalendar(year, month)
+    kth_weekday = [
+        day for week in monthcal for day in week
+        if day.weekday() == weekday_num and day.month == month
+    ][k]
+    return kth_weekday
+
+
+
+def process_df(df):
+    df = expand_col(df, 'lastTradeDate')
+    df = expand_col(df, 'priceChart')
+
+    df['year'] = df['expirationDate'].apply(lambda x: int(x[:4]))
+    df['month'] = df['expirationDate'].apply(lambda x: int(x[4:6]))
+
+    js = df.apply(lambda row: kth_weekday_of_month(row['year'], row['month'], 2, calendar.WEDNESDAY), axis=1)
+    js = np.where(
+        df['productCode'] == 'SR1',
+        df['expirationDate'],
+        js,
+    )
+
+    df['firstFixingDate'] = js
+    df['firstFixingDate'] = pd.to_datetime(df['firstFixingDate']).dt.date
+    df['lastTradeDate'] = pd.to_datetime(df['dateOnlyLongFormat']).dt.date
+    df['finalSettlementDate'] = df['lastTradeDate'] + datetime.timedelta(days=1)
+
+    df['mark'] = np.where(df['close'] == '-', df['last'], df['close'])
+    df['mark'] = np.where(df['mark'] == '-', df['priorSettle'], df['mark'])
+
+    df['mark'] = pd.to_numeric(df['mark'], errors='coerce')
+
+    df = df.loc[ ~df['mark'].isna() ]
