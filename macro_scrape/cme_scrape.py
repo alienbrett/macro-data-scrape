@@ -127,3 +127,7 @@ def process_df(df):
     df['mark'] = pd.to_numeric(df['mark'], errors='coerce')
 
     df = df.loc[ ~df['mark'].isna() ]
+    
+    df['markRate'] = 100 - df['mark'].astype(float)
+
+    return df
