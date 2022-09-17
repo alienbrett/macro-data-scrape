@@ -44,3 +44,25 @@ asyncio.run(sofr_hist_req.load())
 print(sofr_hist_req.data_df.head())
 
 ```
+
+# Lookup ISIN numbers
+Uses ANNA ISIN lookup service. Make an account over at [www.annaservice.com](https://www.annaservice.com/)
+```python3
+
+search_obj_1 = SecuritySearchObj(
+    ### Lookup all entities with 'apple' in the description/name
+    entityName = 'apple',
+)
+
+search_obj_2 = SecuritySearchObj(
+    ### Get a security by ISIN directly
+    isinValue = 'US0378331005',
+)
+
+async def main():
+    async with ISINSearchObj(username='my_email@gmail.com', password='my_password') as client:
+        df = await client.search_securities(search_obj = search_obj_1)
+        print(df)
+
+asyncio.run(main())
+```
