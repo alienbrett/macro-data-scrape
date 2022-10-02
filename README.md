@@ -16,7 +16,7 @@ Its pretty easy to add other CME sources if you need. If you find the product co
 ## Loading sofr futures data (1m + 3m futures)
 ```python3
 import asyncio
-from cme_scrape import CME1MSOFRFutureScrapeRequest, CME3MSOFRFutureScrapeRequest
+from macro_scrape.cme_scrape import CME1MSOFRFutureScrapeRequest, CME3MSOFRFutureScrapeRequest
 
 
 sofr_1m_req = CME1MSOFRFutureScrapeRequest()
@@ -34,7 +34,7 @@ print(sofr_3m_req.data_df.head())
 ## Loading sofr historical data
 ```python3
 import asyncio
-from fed_sofr_history import FedSOFRHistoryRequest
+from macro_scrape.fed_sofr_history import FedSOFRHistoryRequest
 
 sofr_hist_req = FedSOFRHistoryRequest(limit=10)
 asyncio.run(sofr_hist_req.load())
@@ -45,6 +45,7 @@ print(sofr_hist_req.data_df.head())
 ## Lookup ISIN numbers
 Uses ANNA ISIN lookup service. Make an account over at [www.annaservice.com](https://www.annaservice.com/)
 ```python3
+from macro_scrape.isin_lookup import SecuritySearchObj, ISINSearchObj
 
 search_obj_1 = SecuritySearchObj(
     ### Lookup all entities with 'apple' in the description/name
@@ -70,7 +71,7 @@ Download public Nasdaq FTP listing information. There are more options available
 
 import pytz
 
-with macro_data_scrape.nasdaq.ftp.get_nasdaq_ftp_client(
+with macro_scrape.nasdaq.ftp.get_nasdaq_ftp_client(
         ### Select one of the following to get a different dataset
         name = 'other_listed',
         # name = 'listed_tickers',
@@ -96,8 +97,7 @@ Download public IB FTP stock borrow/loan rates and share availability. It seems 
 
 import pytz
 
-
-with macro_data_scrape.interactive_brokers.get_ib_borrow_ftp_client(country='usa'):
+with macro_scrape.interactive_brokers.get_ib_borrow_ftp_client(country='usa'):
     print(client.last_modified().astimezone(pytz.timezone('US/Eastern')))
 
     if not client.local_copy_exists():
