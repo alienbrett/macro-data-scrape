@@ -5,7 +5,10 @@ These tools are meant to provide users with programatic access to financial data
 
 ## Supports
 * SOFR historical rates, from NYC Fed site
-* CME 1M and 3M SOFR futures quotes
+* CME 1M and 3M SOFR futures quotes (with support for other quotes coming soon)
+* ISIN lookups, from ANNA search service
+* Nasdaq listing information, from public Nasdaq FTP site
+* Interactive Brokers stock borrow and locate availability information, from IB public FTP site
 
 Its pretty easy to add other CME sources if you need. If you find the product code and the landing page, you can build a class in like 2 lines that scrapes a different futures product from the site.
 
@@ -45,7 +48,7 @@ print(sofr_hist_req.data_df.head())
 
 ```
 
-# Lookup ISIN numbers
+## Lookup ISIN numbers
 Uses ANNA ISIN lookup service. Make an account over at [www.annaservice.com](https://www.annaservice.com/)
 ```python3
 
@@ -67,7 +70,7 @@ async def main():
 asyncio.run(main())
 ```
 
-# NASDAQ stock listings
+## NASDAQ stock listings
 Download public Nasdaq FTP listing information. There are more options available than is displayed here. It seems this resource is refreshed nightly every business day.
 ```python3
 
@@ -93,7 +96,7 @@ print(df.iloc[[0]].T)
 ```
 
 
-# Interactive Brokers Stock Borrow
+## Interactive Brokers Stock Borrow
 Download public IB FTP stock borrow/loan rates and share availability. It seems this resource is refreshed every 15 minutes.
 ```python3
 
