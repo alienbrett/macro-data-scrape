@@ -12,12 +12,6 @@ These tools are meant to provide users with programatic access to financial data
 
 Its pretty easy to add other CME sources if you need. If you find the product code and the landing page, you can build a class in like 2 lines that scrapes a different futures product from the site.
 
-## Notice
-* These endpoints may change, which could render these utils broken until fixed
-* Data providers may delay the data feeds by a few minutes to hours, so there's no guarantee the data here is live
-
-Use these tools at your own risk.
-
 
 ## Loading sofr futures data (1m + 3m futures)
 ```python3
@@ -113,3 +107,10 @@ with macro_data_scrape.interactive_brokers.get_ib_borrow_ftp_client(country='usa
     df = client.load_from_local()
 print(df.iloc[[0]].T)
 ```
+
+
+## Notice
+* These endpoints may change, which could render these utils broken until fixed
+* Data providers may delay the data feeds by a few minutes to hours, so there's no guarantee the data here is live
+
+Use these tools at your own risk.
