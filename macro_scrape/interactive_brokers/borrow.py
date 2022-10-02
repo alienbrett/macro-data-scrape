@@ -43,3 +43,20 @@ def get_ib_borrow_ftp_client (
     )
 
     return client
+
+
+
+if __name__ == '__main__':
+    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+    with get_ib_borrow_ftp_client(country='usa') as client:
+
+        print(client.last_modified().astimezone(pytz.timezone('US/Eastern')))
+
+        if not client.local_copy_exists():
+            print('downloading file')
+            client.download_file()
+
+        df = client.load_from_local()
+
+    # print(df.head())
+    print(df.iloc[[0]].T)
