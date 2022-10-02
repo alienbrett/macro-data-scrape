@@ -66,3 +66,30 @@ async def main():
 
 asyncio.run(main())
 ```
+
+# NASDAQ stock listings
+Download public Nasdaq FTP listing information. There are more options available than is displayed here.
+```python3
+
+import pytz
+
+from macro_data_scrape.nasdaq import ftp as ndxftp
+
+with fdxftp.get_nasdaq_ftp_client(
+        ### Select one of the following to get a different dataset
+        name = 'other_listed',
+        # name = 'listed_tickers',
+        # name = 'options',
+        # name = 'bxoptions',
+        # name = 'psx_traded',
+    ) as client:
+
+    print(client.last_modified().astimezone(pytz.timezone('US/Eastern')))
+
+    if not client.local_copy_exists():
+        print('downloading file')
+        client.download_file()
+
+    df = client.load_from_local()
+print(df.iloc[[0]].T)
+```
