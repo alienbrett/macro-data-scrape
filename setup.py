@@ -13,20 +13,16 @@ from setuptools import find_packages, setup, Command
 
 # Package meta-data.
 NAME = 'macro_scrape'
-DESCRIPTION = 'Scrape macro data quickly and easily in python'
+DESCRIPTION = 'Scrape economic/finance data in python'
 URL = 'https://github.com/alienbrett/macro-data-scrape'
 EMAIL = 'alienbrett648@gmail.com'
 AUTHOR = 'Brett Graves'
 REQUIRES_PYTHON = '>=3.9.0'
-VERSION = '0.1.0'
+VERSION = '0.2.0'
 
 # What packages are required for this module to be executed?
-REQUIRED = [
-    'httpx',
-    'pandas',
-    
-    # 'requests', 'maya', 'records',
-]
+with open('requirements.txt', 'r') as f:
+    REQUIRED = f.readlines()
 
 # What packages are optional?
 EXTRAS = {
