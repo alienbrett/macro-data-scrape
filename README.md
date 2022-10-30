@@ -6,6 +6,7 @@ These tools are meant to provide users with programatic access to financial data
 ## Supports
 * SOFR historical rates, from NYC Fed site
 * CME 1M and 3M SOFR futures quotes (with support for other quotes coming soon)
+* CME futures + futures options settlement
 * ISIN lookups, from ANNA search service
 * Nasdaq listing information, from public Nasdaq FTP site
 * Interactive Brokers stock borrow and locate availability information, from IB public FTP site
@@ -28,6 +29,24 @@ sofr_3m_req = CME3MSOFRFutureScrapeRequest()
 asyncio.run(sofr_3m_req.load(verbose=True))
 print(sofr_3m_req.data_df.head())
 
+```
+
+## Pull in latest CME futures + options on futures settlement info
+```python3
+iimport macro_scrape.cme.settlements
+import pytz
+
+with macro_scrape.cme.settlements.get_cme_ftp_client(
+        name = 'settlements',
+    ) as client:
+
+    print(client.last_modified().astimezone(pytz.timezone('US/Eastern')))
+
+    if not client.local_copy_exists():
+        print('downloading file')
+        client.download_file()
+
+    cme_settlements_df = client.load_from_local()
 ```
 
 
