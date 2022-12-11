@@ -49,6 +49,20 @@ with macro_scrape.cme.settlements.get_cme_ftp_client(
     cme_settlements_df = client.load_from_local()
 ```
 
+We can also get a dataframe of all settlement prices for a date (about 5 most recent days):
+```python3
+import macro_scrape.cme.settlements
+df = macro_scrape.cme.irs.CMESettleResource.get_settlements(
+    dt = datetime.datetime.now().date(),
+    
+    ## can pick exchange in ('cme','cbt','nymex','comex')
+    exch = 'cme',
+    
+    ## Probably leave this flag alone - we just download the zip file and un-compress on read
+    compressed = True,
+)
+```
+
 CME also provides ATM swaption volatility data for about 5 days:
 ```python3
 import macro_scrape.cme.irs
