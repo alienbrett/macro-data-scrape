@@ -33,7 +33,7 @@ print(sofr_3m_req.data_df.head())
 
 ## Pull in latest CME futures + options on futures settlement info
 ```python3
-iimport macro_scrape.cme.settlements
+import macro_scrape.cme.settlements
 import pytz
 
 with macro_scrape.cme.settlements.get_cme_ftp_client(
