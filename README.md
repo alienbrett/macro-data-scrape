@@ -49,6 +49,14 @@ with macro_scrape.cme.settlements.get_cme_ftp_client(
     cme_settlements_df = client.load_from_local()
 ```
 
+CME also provides ATM swaption volatility data for about 5 days:
+```python3
+import macro_scrape.cme.irs
+df = macro_scrape.cme.irs.CMEIRSResource.get_atm_vol_on_date(
+    datetime.datetime.now().date()
+)
+```
+
 
 ## Loading sofr historical data
 ```python3
@@ -126,6 +134,7 @@ with macro_scrape.interactive_brokers.get_ib_borrow_ftp_client(country='usa'):
     df = client.load_from_local()
 print(df.iloc[[0]].T)
 ```
+
 
 
 ## Notice
