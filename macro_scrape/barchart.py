@@ -111,14 +111,14 @@ class BarchartSearchObj:
 
         if new_secret is not None:
             self._secret = urllib.parse.unquote(new_secret)
-            print('got secret', self._secret)
+            log.debug('got secret {0}'.format(self._secret))
 
         return self._secret
 
 
     async def perform_landing(self, relative_url:str):
         search_url = urllib.parse.urljoin(base_url, relative_url)
-        log.info('performing landing to url: {0}'.format(search_url))
+        log.debug('performing landing to url: {0}'.format(search_url))
 
         # Install the cookies & whatnot they give us
         page = await self.client.get(search_url, follow_redirects=True)
@@ -131,7 +131,6 @@ class BarchartSearchObj:
     async def search_future(self, ticker : str):
         ticker = ticker.upper()
         futures_base = ticker[:-3]
-        # print('futures base:', futures_base)
 
         await self.perform_landing('/futures/quotes/{0}/overview'.format(ticker))
 
@@ -201,22 +200,27 @@ class BarchartSearchObj:
 
 
 
-    async def get_minute_quotes(self,
+    async def get_ohlc_quotes(self,
             ticker              : str,
-            interval            : int,
-            max_records         : int=1_000,
+            interval            : Optional[int],
+            max_records         : int=10_000,
             dividends           : bool=False,
             back_adjust         : bool=False,
             days_to_expiration  : int = 1,
             contract_roll       : str = 'expiration',
         ):
+        """Returns a dataframe of OHLC quotes for a given ticker.
+        If interval is None, then it returns OHLC over each day. Otherwise, interval is the size in minutes of each OHLC interval.
+        """
         ticker = ticker.upper()
 
         await self.perform_landing('/futures/quotes/{0}/overview'.format(ticker))
 
-        search_url = urllib.parse.urljoin(base_url, self.api_min_quote_url)
+        if interval is None:
+            search_url = urllib.parse.urljoin(base_url, self.api_day_quote_url)
+        else:
+            search_url = urllib.parse.urljoin(base_url, self.api_min_quote_url)
 
-        # fields = 'symbol,symbolType,contractName,contractExpirationDate,lastPrice,priceChange,highPrice,lowPrice,volume,tradeTime,symbolCode'.split(',')
         params = {
             # 'fields': ','.join(fields),
             'symbol'            : ticker,
@@ -239,17 +243,32 @@ class BarchartSearchObj:
         page.raise_for_status()
 
         raw = StringIO(page.text)
-        print(page.text)
-        columns = [
-            'timestamp',
-        ]
-        df = pd.read_csv(raw)
-        # df = pd.read_csv(raw, names=columns)
-        # df = BarchartSearchObj.fmt_cols(
-        #     df,
-        #     date_cols       = (''),
-        #     numeric_cols    = ('volume',),
-        # )
+        if interval is None:
+            columns = [
+                'open',
+                'high',
+                'low',
+                'close',
+                'volume',
+                'open_interest',
+            ]
+        else:
+            columns = [
+                # 'timestamp',
+                'something',
+                'open',
+                'high',
+                'low',
+                'close',
+                'volume',
+            ]
+        df = pd.read_csv(raw, names=columns)
+        if interval is None:
+            df = df.loc[df.index.get_level_values(0)[0]]
+            df.index = pd.to_datetime(df.index)
+        else:
+            df.index = pd.to_datetime(df.index).tz_localize(us_eastern)
+        df = df.drop(columns={'something'}, errors='ignore')
         return df
     
 
@@ -257,8 +276,7 @@ class BarchartSearchObj:
     async def get_contract_details(self, future_ticker : str) -> pd.Series:
 
         landing_page = await self.perform_landing('futures/quotes/{0}/profile'.format(future_ticker.upper()))
-
-        soup = BeautifulSoup(landing_page.text, features='lxml')
+        soup = BeautifulSoup(landing_page.text )
         contract_table_html = soup.find('div', {'class':'text-block futures'}).find('table')
 
         df = html_table_to_pandas(contract_table_html)
@@ -308,3 +326,4 @@ class BarchartSearchObj:
 
     async def get_all_historic_product_chain_quotes(self, product_ticker : str, page:int=1, limit:int=1_000) -> pd.DataFrame:
         all_contracts_df = await self.get_all_historic_product_chain(product_ticker, page=page, limit=limit)
+        return all_contracts_df

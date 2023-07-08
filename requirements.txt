@@ -3,3 +3,5 @@ numpy
 httpx
 pytz
 urllib3
+html5lib
+lxml
